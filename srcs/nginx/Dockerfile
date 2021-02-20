@@ -13,12 +13,19 @@ RUN openssl req -newkey rsa:2048 -x509 -sha256 -days 365 \
 -nodes -out /etc/ssl/localhost.crt -keyout /etc/ssl/localhost.key \
 -subj "/C=RU/ST=21school/L=21school/O=sedric/CN=www.server_sedric.com"
 
-COPY  ./start.sh /
+RUN ssh-keygen -A
 
-EXPOSE 80 443
+COPY  ./start.sh /
+COPY ./supervisord.conf /etc/supervisord.conf
+
+# RUN echo -e "sedric123\ssedric123" | adduser sedric
+
+EXPOSE 80 443 22
 
 RUN chmod +x *.sh
 
 RUN mkdir -p /run/nginx
 
-CMD ["./start.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+
+# CMD ["/start.sh"]
