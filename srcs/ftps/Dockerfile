@@ -11,6 +11,14 @@ RUN openssl req -newkey rsa:2048 -x509 -sha256 -days 365 \
 
 COPY ./vsftpd.conf /etc/vsftpd/vsftpd.conf
 
+RUN mkdir -p /var/ftp
+
+RUN mkdir -p /var/ftp/user
+
+RUN adduser -D -h /var/ftp user
+
+RUN echo 'user:user' | chpasswd
+
 EXPOSE 21
 
-CMD ["sh"]
+CMD ["vsftpd", "/etc/vsftpd/vsftpd.conf"]
