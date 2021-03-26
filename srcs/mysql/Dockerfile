@@ -1,12 +1,23 @@
-FROM ubuntu:latest
+FROM alpine:3.12
 
-RUN apt-get update && apt-get -y upgrade
+RUN apk update && apk upgrade
 
-RUN apt install -y mysql-server 
+RUN apk add openrc
+RUN apk add mariadb mariadb-common mariadb-client
+RUN apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted --no-cache
 
-RUN apt install mysql-client
+RUN mkdir -p /etc/telegraf
 
-CMD ["bash"]
+COPY ./my.cnf /etc/mysql/
+COPY ./telegraf.conf /etc/telegraf/
+COPY ./wordpress.sql .
+COPY ./start_database.sh .
 
-# https://obu4alka.ru/kak-nastroit-phpmyadmin-na-nginx-i-php-7.html
-# настройка PHPMYADMIN
+VOLUME [ "var/lib/mysql" ]
+VOLUME [ "/sys/fs/cgroup" ]
+
+EXPOSE 3306
+
+RUN chmod +x /start_database.sh
+
+CMD  [ "sh", "/start_database.sh" ]

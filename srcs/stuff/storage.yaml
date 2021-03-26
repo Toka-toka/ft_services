@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: storage-vol
+  labels:
+    type: local
+spec:
+  storageClassName: storage-vol
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/storage"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: storage-claim
+spec:
+  storageClassName: storage-vol
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Mi
