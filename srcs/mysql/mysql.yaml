@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: mysql
   annotations:
-    metallb.universe.tf/allow-shared-ip: shared
+    metallb.universe.tf/allow-shared-ip: default
   labels:
     app: mysql
 spec:
@@ -37,7 +37,7 @@ spec:
           claimName: storage-claim
       containers:
       - name: mysql
-        image: mysql_image
+        image: mysql
         imagePullPolicy: Never
         ports:
         - containerPort: 3306
