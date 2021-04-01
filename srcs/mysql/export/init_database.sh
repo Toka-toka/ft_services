@@ -8,7 +8,5 @@ echo "CREATE USER 'sedric'@'%' IDENTIFIED BY 'sedric';"  | mysql -u root --skip-
 echo "GRANT ALL PRIVILEGES ON wordpress.* TO 'sedric'@'%';" | mysql -u root --skip-password
 echo "FLUSH PRIVILEGES;" | mysql -u root --skip-password
 mysql wordpress -u root --password= < ./wordpress.sql
-
 rc-service mariadb stop
-echo "IM HERE!!!!!"
-usr/bin/mysqld -u root
+/usr/bin/supervisord -c ./supervisord.conf

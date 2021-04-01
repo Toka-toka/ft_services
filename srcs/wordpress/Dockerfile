@@ -1,28 +1,25 @@
 FROM alpine:3.12
 
-RUN apk update && apk upgrade
+COPY ./export/ .
 
-RUN apk add wget nginx supervisor openrc
-RUN apk add php7 php7-fpm php7-opcache php7-gd php7-mysqli php7-zlib php7-curl php7-mbstring php7-json php7-session
-# RUN apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted --no-cache
+RUN apk update && apk update && apk add supervisor
 
-RUN wget https://wordpress.org/latest.tar.gz
-RUN tar -xvf latest.tar.gz
-RUN mv wordpress /var/www/wordpress
+RUN apk add php7 php7-fpm php7-opcache php7-gd php7-mysqli php7-zlib php7-curl php7-mbstring php7-json php7-session && \
+    mkdir -p /var/run/php
 
-RUN mkdir -p /run/nginx
-RUN mkdir -p /var/run/php
+RUN apk add nginx && \
+    mkdir -p /run/nginx && \
+    mv ./nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY ./wp-config.php /var/www/wordpress/wp-config.php
-COPY ./nginx.conf /etc/nginx/conf.d/nginx.conf
-COPY ./supervisord.conf /etc/supervisord.conf
+RUN apk add wget && wget https://wordpress.org/latest.tar.gz && \
+    tar -xvf latest.tar.gz && \ 
+    mv wordpress /var/www/wordpress && \
+    mv ./wp-config.php /var/www/wordpress/wp-config.php
 
-# RUN mkdir -p /etc/telegraf
-# COPY ./telegraf.conf /etc/telegraf/
-
-# COPY ./start_server.sh ./tmp
-# RUN chmod +x ./tmp/start_server.sh
+RUN apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted --no-cache && \
+    mkdir -p /etc/telegraf  && \
+    mv ./telegraf.conf /etc/telegraf/telegraf.conf
 
 EXPOSE 5050
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "./supervisord.conf"]

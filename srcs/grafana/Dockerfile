@@ -4,17 +4,14 @@ COPY ./export/ .
 
 RUN apk update && apk update && apk add supervisor
 
-RUN apk add openrc mariadb mariadb-common mariadb-client && \
-    mv ./my.cnf /etc/mysql/ && \
-    chmod +x /init_database.sh
+RUN apk add grafana --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted --no-cache && \
+    mkdir /usr/share/grafana/data/ && \
+    mv ./grafana.db /usr/share/grafana/data/
 
 RUN apk add telegraf --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted --no-cache && \
     mkdir -p /etc/telegraf  && \
     mv ./telegraf.conf /etc/telegraf/telegraf.conf
 
-VOLUME [ "var/lib/mysql" ]
-VOLUME [ "/sys/fs/cgroup" ]
+EXPOSE 3000
 
-EXPOSE 3306
-
-CMD  [ "sh", "./init_database.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
